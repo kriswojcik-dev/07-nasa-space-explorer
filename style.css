@@ -188,6 +188,11 @@ button:hover {
   height: 200px;
   object-fit: cover;
   border-radius: 1px;
+  transition: transform 220ms ease;
+}
+
+.gallery-item:hover img {
+  transform: scale(1.05);
 }
 
 .gallery-item p {
