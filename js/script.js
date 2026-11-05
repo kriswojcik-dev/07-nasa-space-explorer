@@ -9,7 +9,7 @@ const modalImage = document.getElementById('modalImage');
 const modalTitle = document.getElementById('modalTitle');
 const modalDate = document.getElementById('modalDate');
 const modalExplanation = document.getElementById('modalExplanation');
-let galleryImages = [];
+let galleryItems = [];
 
 // NASA provides DEMO_KEY for learning and small projects.
 const apiKey = 'DEMO_KEY';
@@ -46,11 +46,21 @@ async function getSpaceImages() {
 		}
 
 		const spaceImages = await response.json();
-		const images = (Array.isArray(spaceImages) ? spaceImages : [spaceImages])
-			.filter((image) => image.media_type === 'image' && image.hdurl);
-		galleryImages = images;
+		galleryItems = (Array.isArray(spaceImages) ? spaceImages : [spaceImages])
+			.filter((image) => image.media_type === 'image' && image.hdurl || image.media_type === 'video' && image.url);
 
-		gallery.innerHTML = images.map((image, index) => `
+		gallery.innerHTML = galleryItems.map((image, index) => image.media_type === 'video'
+			? `
+				<article class="gallery-item video-item">
+					<div class="video-preview" aria-hidden="true">VIDEO</div>
+					<p><strong>${image.title}</strong></p>
+					<p>${image.date}</p>
+					<a class="video-link" href="${image.url}" target="_blank" rel="noopener">
+						Watch video on NASA <span aria-hidden="true">↗</span>
+					</a>
+				</article>
+			`
+			: `
 				<article class="gallery-item" data-image-index="${index}" tabindex="0" role="button">
 					<img src="${image.hdurl}" alt="${image.title}" />
 					<p><strong>${image.title}</strong></p>
@@ -94,15 +104,15 @@ function closeModal() {
 gallery.addEventListener('click', (event) => {
 	const galleryItem = event.target.closest('.gallery-item');
 
-	if (galleryItem) {
-		openModal(galleryImages[galleryItem.dataset.imageIndex]);
+	if (galleryItem && galleryItem.dataset.imageIndex !== undefined) {
+		openModal(galleryItems[galleryItem.dataset.imageIndex]);
 	}
 });
 
 gallery.addEventListener('keydown', (event) => {
 	if (event.key === 'Enter' || event.key === ' ') {
 		event.preventDefault();
-		openModal(galleryImages[event.target.dataset.imageIndex]);
+		openModal(galleryItems[event.target.dataset.imageIndex]);
 	}
 });
 

@@ -177,6 +177,37 @@ button:hover {
   font-size: 17px;
 }
 
+.video-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  background: var(--space-ink);
+  color: white;
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.video-item {
+  cursor: default;
+}
+
+.video-link {
+  display: inline-block;
+  margin: 8px 5px 0;
+  padding: 10px 12px;
+  background: var(--nasa-red);
+  color: white;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.video-link:hover,
+.video-link:focus {
+  background: #d92f17;
+  text-decoration: underline;
+}
+
 /* Placeholder content */
 .placeholder {
   flex: 1 1 100%;
