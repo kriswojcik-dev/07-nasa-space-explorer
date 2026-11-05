@@ -176,6 +176,23 @@ button:hover {
   outline-offset: 3px;
 }
 
+/* Give small screens more room for the content */
+@media (max-width: 599px) {
+  .site-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .logo {
+    margin-right: 0;
+    margin-bottom: 14px;
+  }
+
+  .gallery-item {
+    min-width: 0;
+  }
+}
+
 /* Three columns on wider screens */
 @media (min-width: 1000px) {
   .gallery-item {
