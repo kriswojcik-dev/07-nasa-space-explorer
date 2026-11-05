@@ -59,7 +59,18 @@ async function getSpaceImages() {
 		const response = await fetch(apiUrl);
 
 		if (!response.ok) {
-			throw new Error('NASA could not return the images.');
+			let errorMessage = `NASA API request failed (${response.status}).`;
+
+			try {
+				const errorData = await response.json();
+				if (errorData.msg) {
+					errorMessage = errorData.msg;
+				}
+			} catch (parseError) {
+				// Use the status message when NASA does not return JSON.
+			}
+
+			throw new Error(errorMessage);
 		}
 
 		const spaceImages = await response.json();
