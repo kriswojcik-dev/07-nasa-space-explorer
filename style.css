@@ -193,6 +193,66 @@ button:hover {
   margin-bottom: 20px;
 }
 
+/* Loading message shown while NASA responds */
+.loading-state {
+  flex: 1 1 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+  padding: 40px 24px;
+  background: var(--paper);
+  border-top: 5px solid var(--nasa-blue);
+  color: var(--nasa-blue);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.loading-orbit {
+  position: relative;
+  width: 46px;
+  height: 46px;
+  margin-bottom: 18px;
+  border: 2px solid rgba(11, 61, 145, 0.25);
+  border-radius: 50%;
+  animation: orbit-spin 1.4s linear infinite;
+}
+
+.loading-orbit::after {
+  position: absolute;
+  top: -5px;
+  left: 18px;
+  width: 8px;
+  height: 8px;
+  background: var(--nasa-red);
+  border-radius: 50%;
+  content: "";
+}
+
+.loading-orbit span {
+  position: absolute;
+  top: 19px;
+  left: 19px;
+  width: 5px;
+  height: 5px;
+  background: var(--nasa-blue);
+  border-radius: 50%;
+}
+
+@keyframes orbit-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-orbit {
+    animation: none;
+  }
+}
+
 /* Image details modal */
 .modal {
   position: fixed;

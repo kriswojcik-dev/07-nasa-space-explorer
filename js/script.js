@@ -29,7 +29,12 @@ async function getSpaceImages() {
 		return;
 	}
 
-	gallery.innerHTML = '<p class="placeholder">Loading space images...</p>';
+	gallery.innerHTML = `
+		<div class="loading-state" role="status" aria-live="polite">
+			<div class="loading-orbit" aria-hidden="true"><span></span></div>
+			<p>🔄 Loading space photos...</p>
+		</div>
+	`;
 
 	const apiUrl = `https://api.nasa.gov/planetary/apod?api_key=${apiKey}&start_date=${startDate}&end_date=${endDate}`;
 
