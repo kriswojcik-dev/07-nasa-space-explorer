@@ -85,15 +85,15 @@ async function getSpaceImages() {
 		let spaceImages;
 
 		try {
+			spaceImages = await getReplacementApodData(startDate, endDate);
+		} catch (replacementApiError) {
 			const response = await fetch(apiUrl);
 
-			if (response.ok) {
-				spaceImages = await response.json();
-			} else {
-				spaceImages = await getReplacementApodData(startDate, endDate);
+			if (!response.ok) {
+				throw replacementApiError;
 			}
-		} catch (legacyApiError) {
-			spaceImages = await getReplacementApodData(startDate, endDate);
+
+			spaceImages = await response.json();
 		}
 
 		galleryItems = (Array.isArray(spaceImages) ? spaceImages : [spaceImages])
