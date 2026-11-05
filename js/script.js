@@ -3,6 +3,7 @@ const startInput = document.getElementById('startDate');
 const endInput = document.getElementById('endDate');
 const getImagesButton = document.querySelector('button');
 const gallery = document.getElementById('gallery');
+const factText = document.getElementById('factText');
 const imageModal = document.getElementById('imageModal');
 const closeModalButton = document.getElementById('closeModal');
 const modalImage = document.getElementById('modalImage');
@@ -10,6 +11,22 @@ const modalTitle = document.getElementById('modalTitle');
 const modalDate = document.getElementById('modalDate');
 const modalExplanation = document.getElementById('modalExplanation');
 let galleryItems = [];
+
+// These facts are randomly selected each time the app loads.
+const spaceFacts = [
+	'One day on Venus is longer than one year on Venus.',
+	'Neutron stars can spin about 600 times every second.',
+	'Our Sun contains more than 99 percent of the mass in our solar system.',
+	'A NASA spacesuit can cost around 12 million dollars.',
+	'There are more trees on Earth than stars in the Milky Way.',
+	'Saturn would float in water because it is less dense than water.',
+	'Footprints on the Moon can last for millions of years because there is no wind.',
+	'Light from the Sun takes about eight minutes to reach Earth.'
+];
+
+// Pick and display one fact when the page loads.
+const randomFactIndex = Math.floor(Math.random() * spaceFacts.length);
+factText.textContent = spaceFacts[randomFactIndex];
 
 // NASA provides DEMO_KEY for learning and small projects.
 const apiKey = 'DEMO_KEY';
