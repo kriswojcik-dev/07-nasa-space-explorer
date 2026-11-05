@@ -3,6 +3,13 @@ const startInput = document.getElementById('startDate');
 const endInput = document.getElementById('endDate');
 const getImagesButton = document.querySelector('button');
 const gallery = document.getElementById('gallery');
+const imageModal = document.getElementById('imageModal');
+const closeModalButton = document.getElementById('closeModal');
+const modalImage = document.getElementById('modalImage');
+const modalTitle = document.getElementById('modalTitle');
+const modalDate = document.getElementById('modalDate');
+const modalExplanation = document.getElementById('modalExplanation');
+let galleryImages = [];
 
 // NASA provides DEMO_KEY for learning and small projects.
 const apiKey = 'DEMO_KEY';
@@ -34,18 +41,15 @@ async function getSpaceImages() {
 		}
 
 		const spaceImages = await response.json();
-		const images = Array.isArray(spaceImages) ? spaceImages : [spaceImages];
+		const images = (Array.isArray(spaceImages) ? spaceImages : [spaceImages])
+			.filter((image) => image.media_type === 'image' && image.hdurl);
+		galleryImages = images;
 
-		gallery.innerHTML = images
-			.filter((image) => image.media_type === 'image' && image.hdurl)
-			.map((image) => `
-				<article class="gallery-item">
-					<a href="${image.hdurl}" target="_blank" rel="noopener">
-						<img src="${image.hdurl}" alt="${image.title}" />
-					</a>
+		gallery.innerHTML = images.map((image, index) => `
+				<article class="gallery-item" data-image-index="${index}" tabindex="0" role="button">
+					<img src="${image.hdurl}" alt="${image.title}" />
 					<p><strong>${image.title}</strong></p>
 					<p>${image.date}</p>
-					<p>${image.explanation}</p>
 				</article>
 			`)
 			.join('');
@@ -66,3 +70,47 @@ setupDateInputs(startInput, endInput);
 
 // Get images when the user clicks the button.
 getImagesButton.addEventListener('click', getSpaceImages);
+
+// Show the selected image and its full APOD details in the modal.
+function openModal(image) {
+	modalImage.src = image.hdurl;
+	modalImage.alt = image.title;
+	modalTitle.textContent = image.title;
+	modalDate.textContent = image.date;
+	modalExplanation.textContent = image.explanation;
+	imageModal.hidden = false;
+	closeModalButton.focus();
+}
+
+function closeModal() {
+	imageModal.hidden = true;
+}
+
+gallery.addEventListener('click', (event) => {
+	const galleryItem = event.target.closest('.gallery-item');
+
+	if (galleryItem) {
+		openModal(galleryImages[galleryItem.dataset.imageIndex]);
+	}
+});
+
+gallery.addEventListener('keydown', (event) => {
+	if (event.key === 'Enter' || event.key === ' ') {
+		event.preventDefault();
+		openModal(galleryImages[event.target.dataset.imageIndex]);
+	}
+});
+
+closeModalButton.addEventListener('click', closeModal);
+
+imageModal.addEventListener('click', (event) => {
+	if (event.target === imageModal) {
+		closeModal();
+	}
+});
+
+document.addEventListener('keydown', (event) => {
+	if (event.key === 'Escape' && !imageModal.hidden) {
+		closeModal();
+	}
+});
