@@ -31,6 +31,32 @@ factText.textContent = spaceFacts[randomFactIndex];
 // NASA provides DEMO_KEY for learning and small projects.
 const apiKey = 'DEMO_KEY';
 
+// Use NASA Science's public APOD feed if the older API is unavailable.
+async function getReplacementApodData(startDate, endDate) {
+	const today = new Date();
+	const startDistance = Math.max(0, Math.floor((today - new Date(`${startDate}T00:00:00Z`)) / 86400000));
+	const endDistance = Math.max(0, Math.floor((today - new Date(`${endDate}T00:00:00Z`)) / 86400000));
+	const firstPage = Math.floor(endDistance / 25) + 1;
+	const lastPage = Math.floor(startDistance / 25) + 1;
+	const pageRequests = [];
+
+	for (let page = firstPage; page <= lastPage; page += 1) {
+		const feedUrl = `https://science.nasa.gov/wp-json/wp/v2/apod-basic?per_page=25&page=${page}`;
+		pageRequests.push(fetch(feedUrl));
+	}
+
+	const responses = await Promise.all(pageRequests);
+
+	if (responses.some((response) => !response.ok)) {
+		throw new Error('NASA APOD services are currently unavailable.');
+	}
+
+	const pageData = await Promise.all(responses.map((response) => response.json()));
+	return pageData
+		.flat()
+		.filter((image) => image.date >= startDate && image.date <= endDate);
+}
+
 // Fetch APOD images for the dates selected by the user.
 async function getSpaceImages() {
 	const startDate = startInput.value;
@@ -56,24 +82,20 @@ async function getSpaceImages() {
 	const apiUrl = `https://api.nasa.gov/planetary/apod?api_key=${apiKey}&start_date=${startDate}&end_date=${endDate}`;
 
 	try {
-		const response = await fetch(apiUrl);
+		let spaceImages;
 
-		if (!response.ok) {
-			let errorMessage = `NASA API request failed (${response.status}).`;
+		try {
+			const response = await fetch(apiUrl);
 
-			try {
-				const errorData = await response.json();
-				if (errorData.msg) {
-					errorMessage = errorData.msg;
-				}
-			} catch (parseError) {
-				// Use the status message when NASA does not return JSON.
+			if (response.ok) {
+				spaceImages = await response.json();
+			} else {
+				spaceImages = await getReplacementApodData(startDate, endDate);
 			}
-
-			throw new Error(errorMessage);
+		} catch (legacyApiError) {
+			spaceImages = await getReplacementApodData(startDate, endDate);
 		}
 
-		const spaceImages = await response.json();
 		galleryItems = (Array.isArray(spaceImages) ? spaceImages : [spaceImages])
 			.filter((image) => image.media_type === 'image' && image.hdurl || image.media_type === 'video' && image.url);
 
@@ -116,11 +138,13 @@ getImagesButton.addEventListener('click', getSpaceImages);
 
 // Show the selected image and its full APOD details in the modal.
 function openModal(image) {
+	const explanationText = document.createElement('div');
+	explanationText.innerHTML = image.explanation;
 	modalImage.src = image.hdurl;
 	modalImage.alt = image.title;
 	modalTitle.textContent = image.title;
 	modalDate.textContent = image.date;
-	modalExplanation.textContent = image.explanation;
+	modalExplanation.textContent = explanationText.textContent;
 	imageModal.hidden = false;
 	closeModalButton.focus();
 }
